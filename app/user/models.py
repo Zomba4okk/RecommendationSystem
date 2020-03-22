@@ -13,8 +13,9 @@ class User(Base):
 
     def get_ratings(self):
         with SessionContext() as session:
-            ratings = session.query(User, Rating, Product). \
-                join(Rating, self.id == Rating.user_id). \
-                join(Product, Product.id == Rating.product_id). \
+            ratings = session.query(Product). \
+                join(Rating, Product.id == Rating.product_id). \
+                join(User, self.id == Rating.user_id). \
                 all()
+
         return ratings
