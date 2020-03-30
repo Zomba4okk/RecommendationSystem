@@ -1,19 +1,18 @@
 from datetime import datetime
 
 from sqlalchemy import create_engine, Column, Integer, DateTime
-from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from sqlalchemy.ext.declarative import as_declarative, declared_attr
 from sqlalchemy.orm import sessionmaker
 
 from config.config import SQLALCHEMY_DATABASE_URI
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-base = declarative_base()
 Session = sessionmaker()
 Session.configure(bing=engine)
 
 
-@declarative_base
-class Base(base):
+@as_declarative()
+class Base:
     @declared_attr
     def __tablename__(cls):
         return cls.__name__.lower()
