@@ -7,8 +7,7 @@ from sqlalchemy.orm import sessionmaker
 from config.config import SQLALCHEMY_DATABASE_URI
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-Session = sessionmaker()
-Session.configure(bing=engine)
+Session = sessionmaker(bind=engine)
 
 
 @as_declarative()
@@ -27,11 +26,11 @@ class SessionContext:
         self.session = Session()
 
     def __enter__(self):
-        yield self.session
-        self.session.commit()
+        return self.session
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         if exc_val:
             self.session.rollback()
             raise
+        self.session.commit()
         self.session.close()
