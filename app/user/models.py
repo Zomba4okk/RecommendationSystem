@@ -11,12 +11,21 @@ class User(Base):
     last_name = Column(String(50))
     ratings = relationship('Rating', back_populates='user')
 
-    def get_ratings(self):
+    @classmethod
+    def get_ratings(cls, id=None):
         session = Session()
 
-        ratings = session.query(Product) \
-            .join(Rating, Product.id == Rating.product_id) \
-            .join(User, self.id == Rating.user_id) \
+        query = session.query(cls) \
+            .join(Rating, cls.id == Rating.user_id) \
+            .join(Product, Product.id == Rating.product_id)
+        if id is not None:
+            query = query.filter(cls.id == id)
+
+        ratings = query \
+            .with_entities(
+                cls.id.label('user_id'),
+                Product.id.label('product_id'),
+                Rating.rate.label('rate')) \
             .all()
 
         return ratings

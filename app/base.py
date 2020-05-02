@@ -19,3 +19,9 @@ class Base:
     id = Column(Integer, primary_key=True)
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
+
+    @classmethod
+    def count(cls):
+        session = Session()
+
+        return session.query(cls).count()
