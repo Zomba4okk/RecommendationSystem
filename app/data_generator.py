@@ -5,12 +5,14 @@ import sys
 BASE_PATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
 sys.path.append(BASE_PATH)
 
-from app.base import SessionContext
+from app.base import Session
 from app.product.models import Product, Rating
 from app.user.models import User
 
 
 if __name__ == '__main__':
+    session = Session()
+
     users = []
     products = []
     ratings = []
@@ -38,9 +40,8 @@ if __name__ == '__main__':
             product_id=randint(1, 20000)
         ))
 
-    with SessionContext() as session:
-        session.add_all(users)
-        session.add_all(products)
-        session.commit()
+    session.add_all(users)
+    session.add_all(products)
+    session.commit()
 
-        session.add_all(ratings)
+    session.add_all(ratings)
