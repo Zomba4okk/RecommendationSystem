@@ -1,14 +1,14 @@
 import numpy as np
 
 
-def k_fract_predict_user(rating, users_count, products_count, distance_matrix, train_data_matrix):
-    top_similar = np.zeros((users_count, rating))
+def k_fract_predict_user(users_count, products_count, distance_matrix, train_data_matrix, top=10):
+    top_similar = np.zeros((users_count, top))
 
-    for i in range(rating):
+    for i in range(top):
         user_sim = distance_matrix[i]
-        top_sim_users = user_sim.argsort()[1:rating + 1]
+        top_sim_users = user_sim.argsort()[1:top + 1]
 
-        for j in range(rating):
+        for j in range(top):
             top_similar[i, j] = top_sim_users[j]
 
     abs_sim = np.abs(distance_matrix)
@@ -27,20 +27,20 @@ def k_fract_predict_user(rating, users_count, products_count, distance_matrix, t
     return pred
 
 
-def k_fract_predict_item(rating, users_count, products_count, distance_matrix, train_data_matrix):
-    top_similar = np.zeros((products_count, rating))
+def k_fract_predict_item(users_count, products_count, distance_matrix, train_data_matrix, top=10):
+    top_similar = np.zeros((products_count, top))
 
     for i in range(products_count):
         products_sim = distance_matrix[i]
-        top_sim_products = products_sim.argsort()[1:rating + 1]
+        top_sim_products = products_sim.argsort()[1:top + 1]
 
-        for j in range(rating):
+        for j in range(top):
             top_similar[i, j] = top_sim_products.T[j]
 
     abs_sim = np.abs(distance_matrix)
     pred = np.zeros((products_count, users_count))
 
-    for i in range(users_count):
+    for i in range(products_count):
         indexes = top_similar[i].astype(np.int)
         numerator = distance_matrix[i][indexes]
 

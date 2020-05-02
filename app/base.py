@@ -2,12 +2,12 @@ from datetime import datetime
 
 from sqlalchemy import create_engine, Column, Integer, DateTime
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 
 from config.config import SQLALCHEMY_DATABASE_URI
 
 engine = create_engine(SQLALCHEMY_DATABASE_URI)
-Session = sessionmaker(bind=engine)
+Session = scoped_session(sessionmaker(bind=engine))
 
 
 @as_declarative()
@@ -20,17 +20,8 @@ class Base:
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now)
 
+    @classmethod
+    def count(cls):
+        session = Session()
 
-class SessionContext:
-    def __init__(self):
-        self.session = Session()
-
-    def __enter__(self):
-        return self.session
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        if exc_val:
-            self.session.rollback()
-            raise
-        self.session.commit()
-        self.session.close()
+        return session.query(cls).count()

@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
-from app.base import Base, SessionContext
+from app.base import Base, Session
 from app.product.models import Product, Rating
 
 
@@ -11,11 +11,21 @@ class User(Base):
     last_name = Column(String(50))
     ratings = relationship('Rating', back_populates='user')
 
-    def get_ratings(self):
-        with SessionContext() as session:
-            ratings = session.query(Product). \
-                join(Rating, Product.id == Rating.product_id). \
-                join(User, self.id == Rating.user_id). \
-                all()
+    @classmethod
+    def get_ratings(cls, id=None):
+        session = Session()
+
+        query = session.query(cls) \
+            .join(Rating, cls.id == Rating.user_id) \
+            .join(Product, Product.id == Rating.product_id)
+        if id is not None:
+            query = query.filter(cls.id == id)
+
+        ratings = query \
+            .with_entities(
+                cls.id.label('user_id'),
+                Product.id.label('product_id'),
+                Rating.rate.label('rate')) \
+            .all()
 
         return ratings
