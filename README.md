@@ -15,5 +15,5 @@ Set *SQLALCHEMY_DATABASE_URI * param in ```config/config.py```
 ## To generate test data
 ```python data_generator.py```
 
-## To generate recomendations:
+## To generate recomendations
 ```python presentation.py```
